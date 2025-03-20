@@ -10,7 +10,8 @@ import { Schema, model } from "mongoose";
 const orderSchema = new Schema(
     {
         CartId: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: "shoppingCarts",
             required: true,
         },
         payMethod: {
