@@ -5,8 +5,7 @@ const codesSchema = new Schema({
     {
       clientId: {
         type: Schema.Types.ObjectId,
-        ref: "clients",
-        unique: true
+        ref: "clients"
       },
     },
   ],
