@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const offerShema = new Schema(
+const  offersSchema = new Schema(
   {
     productId: {
       type: Schema.Types.ObjectId,
@@ -34,3 +34,4 @@ const offerShema = new Schema(
     timestamps: true,
   }
 );
+export default model("offers", offersSchema);
