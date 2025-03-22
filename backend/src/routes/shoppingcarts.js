@@ -3,12 +3,15 @@ import express from "express";
 const router = express.Router();
 import shoppingCartsController from "../controllers/shoppingCartsController.js";
 
+router.route("/")
+  .get(shoppingCartsController.getShoppingCarts)
+  .post(shoppingCartsController.createShoppingCart);
 
-router.get("/", shoppingCartsController.getShoppingCarts);
-router.get("/:id", shoppingCartsController.getShoppingCart);
-router.post("/", shoppingCartsController.createShoppingCart);
-router.put("/:id", shoppingCartsController.updateShoppingCart);
-router.delete("/:id", shoppingCartsController.deleteShoppingCart);
+router.route("/:id")
+  .get(shoppingCartsController.getShoppingCart)
+  .put(shoppingCartsController.updateShoppingCart)
+  .delete(shoppingCartsController.deleteShoppingCart);
+
 router.post("/:id/addProduct", shoppingCartsController.addProduct);
 router.post("/:id/removeProduct", shoppingCartsController.removeProduct);
 
