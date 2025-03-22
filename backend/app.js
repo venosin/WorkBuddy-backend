@@ -14,13 +14,12 @@ import offersRoute from "./src/routes/offers.js"
 const app = express();
 
 //middleware para aceptar datos desde postman
-app.use(express.json());
+app.use(express.json()); // Aceptar JSON en las solicitudes
 app.use("/wb/clients", clientsRouter);
 app.use("/wb/discountCodes", dCodesRouter)
 app.use("/wb/employees", employeesRoutes)
 app.use("/wb/offers", offersRoute)
 //Archivo la constante para poder usar express en otros archivos
-export default app;
 
 //Mando a llamar a rutas steven
 app.use("/wb/products", productsRoutes);
@@ -28,6 +27,7 @@ app.use("/wb/orders", ordersRoutes);
 app.use("/wb/shoppingcarts", shoppingCartsRoutes);
 app.use("/wb/reviews", reviewsRoutes);
 
+export default app;
 
 
 

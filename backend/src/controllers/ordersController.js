@@ -1,6 +1,7 @@
 // Aquí en el controlador irán todos los métodos (CRUD)
 
 import Order from "../models/Orders.js";
+import mongoose from "mongoose";
 const ordersController = {};
 
 // OBTENER TODAS LAS ÓRDENES
@@ -37,30 +38,31 @@ ordersController.getOrderById = async (req, res) => {
 // CREAR UNA NUEVA ORDEN
 ordersController.createOrder = async (req, res) => {
     try {
-        const { items, shippingAddress, paymentMethod } = req.body;
+        console.log("Body recibido:", req.body); // Depuración
 
-        const newOrder = new Order({
-            user: req.user.id, // Usuario autenticado
-            items,
-            shippingAddress,
-            paymentMethod,
-            status: "pending",
-            totalAmount: items.reduce((total, item) => total + (item.price * item.quantity), 0),
-        });
+        const { CartId, payMethod, shippingAdress } = req.body;
+
+        // Validar que los datos existen
+        if (!CartId || !payMethod || !shippingAdress) {
+            return res.status(400).json({ message: "Faltan datos obligatorios" });
+        }
+
+        // Validar que CartId es un ObjectId válido
+        if (!mongoose.Types.ObjectId.isValid(CartId)) {
+            return res.status(400).json({ message: "CartId no es válido" });
+        }
+
+        const newOrder = new Order({ CartId, payMethod, shippingAdress });
 
         const order = await newOrder.save();
 
-        // Retornar orden con datos poblados
-        const populatedOrder = await Order.findById(order._id)
-            .populate("user", "name email")
-            .populate("items.product", "name price");
-
-        res.json({ message: "Orden creada con éxito", order: populatedOrder });
+        res.status(201).json({ message: "Orden creada con éxito", order });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error al crear la orden" });
+        console.error("Error al crear la orden:", error);
+        res.status(500).json({ message: "Error al crear la orden", error });
     }
 };
+
 
 // ACTUALIZAR ESTADO DE ORDEN
 ordersController.updateOrderStatus = async (req, res) => {

@@ -30,4 +30,4 @@ const orderSchema = new Schema(
     }
 );
 
-export default model("Order", orderSchema)
+export default model("orders", orderSchema)
