@@ -1,5 +1,6 @@
 // importar lo de lalibreria "express"
 import express from "express" ;
+import cors from "cors";
 //ENDPOINTS STEVEN imports ruotes from steven
 import productsRoutes from "./src/routes/products.js";
 import ordersRoutes from "./src/routes/orders.js";
@@ -12,6 +13,14 @@ import employeesRoutes from "./src/routes/employees.js"
 import offersRoute from "./src/routes/offers.js"
 //Creso la constante para poder usar express en otros archivos
 const app = express();
+
+// Middlewares
+app.use(
+    cors({
+      origin: "http://localhost:5173", // Dominio del cliente
+      credentials: true, // Permitir envío de cookies y credenciales
+    })
+  );
 
 //middleware para aceptar datos desde postman
 app.use(express.json()); // Aceptar JSON en las solicitudes
