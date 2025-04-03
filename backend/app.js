@@ -6,11 +6,17 @@ import productsRoutes from "./src/routes/products.js";
 import ordersRoutes from "./src/routes/orders.js";
 import shoppingCartsRoutes from "./src/routes/shoppingcarts.js";
 import reviewsRoutes from "./src/routes/reviews.js";
+import registerEmployeeRoutes from "./src/routes/registerEmployee.js";
 //ENDPOINTS imports routes from RODRI
 import clientsRouter from "./src/routes/clients.js";
 import dCodesRouter from "./src/routes/dCodes.js"
 import employeesRoutes from "./src/routes/employees.js"
 import offersRoute from "./src/routes/offers.js"
+import cookieParser from "cookie-parser";
+//login y logut
+import loginRoutes from "./src/routes/login.js";
+import logoutRoutes from "./src/routes/logout.js";
+
 //Creso la constante para poder usar express en otros archivos
 const app = express();
 
@@ -24,17 +30,24 @@ app.use(
 
 //middleware para aceptar datos desde postman
 app.use(express.json()); // Aceptar JSON en las solicitudes
+app.use(cookieParser()); //Para que POSTMAN guarde el token en una cookie 
+
+//Mando a llamar a rutas 
+//RODRI
 app.use("/wb/clients", clientsRouter);
 app.use("/wb/discountCodes", dCodesRouter)
 app.use("/wb/employees", employeesRoutes)
 app.use("/wb/offers", offersRoute)
-//Archivo la constante para poder usar express en otros archivos
-
-//Mando a llamar a rutas steven
+// steven
 app.use("/wb/products", productsRoutes);
 app.use("/wb/orders", ordersRoutes);
 app.use("/wb/shoppingcarts", shoppingCartsRoutes);
 app.use("/wb/reviews", reviewsRoutes);
+app.use("/wb/logout", logoutRoutes);
+
+// Rutas publicas que no necesitan haber iniciado sesión
+app.use("/wb/registerEmployee", registerEmployeeRoutes);
+app.use("/wb/login", loginRoutes);
 
 export default app;
 
