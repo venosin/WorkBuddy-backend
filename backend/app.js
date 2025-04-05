@@ -17,6 +17,8 @@ import cookieParser from "cookie-parser";
 //login y logut
 import loginRoutes from "./src/routes/login.js";
 import logoutRoutes from "./src/routes/logout.js";
+//recuperación de contraseña
+import passwordRecoveryRoutes from "./src/routes/passwordRecovery.js";
 
 //Creso la constante para poder usar express en otros archivos
 const app = express();
@@ -50,6 +52,7 @@ app.use("/wb/logout", logoutRoutes);
 app.use("/wb/registerEmployee", registerEmployeeRoutes);
 app.use("/wb/registerClient", registerClientRoutes);
 app.use("/wb/login", loginRoutes);
+app.use("/wb/passwordRecovery", passwordRecoveryRoutes);
 
 export default app;
 
