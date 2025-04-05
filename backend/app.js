@@ -7,6 +7,7 @@ import ordersRoutes from "./src/routes/orders.js";
 import shoppingCartsRoutes from "./src/routes/shoppingcarts.js";
 import reviewsRoutes from "./src/routes/reviews.js";
 import registerEmployeeRoutes from "./src/routes/registerEmployee.js";
+import registerClientRoutes from "./src/routes/registerClient.js"
 //ENDPOINTS imports routes from RODRI
 import clientsRouter from "./src/routes/clients.js";
 import dCodesRouter from "./src/routes/dCodes.js"
@@ -47,9 +48,10 @@ app.use("/wb/logout", logoutRoutes);
 
 // Rutas publicas que no necesitan haber iniciado sesión
 app.use("/wb/registerEmployee", registerEmployeeRoutes);
+app.use("/wb/registerClient", registerClientRoutes);
 app.use("/wb/login", loginRoutes);
 
 export default app;
 
-
+  
 

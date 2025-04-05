@@ -15,7 +15,7 @@ export const config = {
     expiresIn: process.env.JWT_EXPIRES_IN || "30d",
   },
   email: {
-    email: "noreply.byteshop@gmail.com",
+    email: "workbuddy2025@gmail.com",
     password: process.env.APP_PASSWORD_EMAIL,
   },
   admin: {
