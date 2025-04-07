@@ -1,4 +1,4 @@
-import offersModel from "../models/offers.js";
+import offersModel from "../models/Offers.js";
 
 const offersController = {};
 

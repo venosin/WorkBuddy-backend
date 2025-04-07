@@ -22,6 +22,11 @@ export const config = {
     email: process.env.ADMIN_EMAIL,
     password: process.env.ADMIN_PASSWORD,
   },
+  cloudinary: {
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+  },
 //   paypal: {
 //     clientId: process.env.PAYPAL_API_CLIENT_ID,
 //     clientSecret: process.env.PAYPAL_API_SECRET,

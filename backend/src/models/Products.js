@@ -5,7 +5,11 @@ Campos:
     category
     price
     stock
-    imagery
+    imagery: {
+      url          - URL de la imagen en Cloudinary
+      public_id    - ID público de la imagen en Cloudinary
+      filename     - Nombre original del archivo
+    }
 */
 
 import { Schema, model } from "mongoose";
@@ -33,8 +37,18 @@ const productSchema = new Schema(
       required: true,
     },
     imagery: {
-      type: String,
-      required: true,
+      url: {
+        type: String,
+        required: true,
+      },
+      public_id: {
+        type: String,
+        required: true,
+      },
+      filename: {
+        type: String,
+        required: false,
+      }
     },
   },
   {

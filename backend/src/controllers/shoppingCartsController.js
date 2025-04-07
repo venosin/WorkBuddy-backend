@@ -1,7 +1,7 @@
 // Aqui en el controlador iran todos los metodos 
 // ( CRUD ) 
 
-import shoppingCartsModel from "../models/shoppingCarts.js";
+import shoppingCartsModel from "../models/ShoppingCarts.js";
 
 const shoppingCartsController = {};
 

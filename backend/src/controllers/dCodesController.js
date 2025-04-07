@@ -1,4 +1,4 @@
-import dCodesModel from "../models/discountCodes.js";
+import dCodesModel from "../models/DiscountCodes.js";
 
 const dCodesController = {};
 

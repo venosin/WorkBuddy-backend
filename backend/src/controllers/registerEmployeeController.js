@@ -1,4 +1,4 @@
-import employeeModel from "../models/employees.js";
+import employeeModel from "../models/Employees.js";
 import bcrypt from "bcryptjs"; // Encriptar
 import jsonwebtoken from "jsonwebtoken"; //Token
 import { config } from "../config.js";

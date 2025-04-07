@@ -2,6 +2,9 @@
 
 const productsController = {};
 import productsModel from "../models/Products.js";
+import { uploadImage, deleteImage } from "../config/cloudinary.js";
+import fs from "fs/promises";
+import path from "path";
 
 // SELECT (Obtener todos los productos)
 productsController.getProducts = async (req, res) => {
@@ -17,40 +20,140 @@ productsController.getProducts = async (req, res) => {
 // INSERT (Crear un nuevo producto)
 productsController.createProduct = async (req, res) => {
     try {
-        const { name, description, category, price, stock, imagery } = req.body;
-        const newProduct = new productsModel({ name, description, category, price, stock, imagery });
-        await newProduct.save();
-        res.json({ message: "Producto creado con éxito" });
+        // Verificar si existe un archivo de imagen en la solicitud
+        if (!req.file) {
+            return res.status(400).json({ message: "Se requiere una imagen del producto" });
+        }
+        
+        // Obtener la ruta del archivo temporal
+        const filePath = req.file.path;
+        
+        // Subir la imagen a Cloudinary
+        const cloudinaryResult = await uploadImage(filePath, 'workbuddy/productos');
+        
+        // Obtener datos del cuerpo de la solicitud
+        const { name, description, category, price, stock } = req.body;
+        
+        // Crear el objeto de imágenes para guardar en la base de datos
+        const imagery = {
+            url: cloudinaryResult.url,
+            public_id: cloudinaryResult.public_id,
+            filename: cloudinaryResult.original_filename || req.file.originalname
+        };
+        
+        // Crear y guardar el nuevo producto
+        const newProduct = new productsModel({ 
+            name, 
+            description, 
+            category, 
+            price, 
+            stock, 
+            imagery 
+        });
+        
+        const savedProduct = await newProduct.save();
+        
+        // Eliminar el archivo temporal después de subirlo a Cloudinary
+        await fs.unlink(filePath);
+        
+        res.status(201).json({ 
+            message: "Producto creado con éxito", 
+            product: savedProduct 
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error creando el producto" });
+        // Si hay un archivo y ocurre un error, intentamos eliminar el archivo temporal
+        if (req.file) {
+            try {
+                await fs.unlink(req.file.path);
+            } catch (unlinkError) {
+                console.error("Error eliminando el archivo temporal:", unlinkError);
+            }
+        }
+        res.status(500).json({ message: "Error creando el producto", error: error.message });
     }
 };
 
 // DELETE (Eliminar un producto por ID)
 productsController.deleteProduct = async (req, res) => {
     try {
+        // Buscar el producto para obtener información sobre la imagen
+        const product = await productsModel.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: "Producto no encontrado" });
+        }
+        
+        // Eliminar la imagen de Cloudinary si existe
+        if (product.imagery && product.imagery.public_id) {
+            await deleteImage(product.imagery.public_id);
+        }
+        
+        // Eliminar el producto de la base de datos
         await productsModel.findByIdAndDelete(req.params.id);
-        res.json({ message: "Producto eliminado" });
+        
+        res.json({ message: "Producto eliminado exitosamente" });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error eliminando el producto" });
+        res.status(500).json({ message: "Error eliminando el producto", error: error.message });
     }
 };
 
 // UPDATE (Actualizar un producto por ID)
 productsController.updateProduct = async (req, res) => {
     try {
-        const { name, description, category, price, stock, imagery } = req.body;
-        const updateProduct = await productsModel.findByIdAndUpdate(
+        // Buscar el producto primero para obtener información sobre la imagen actual
+        const existingProduct = await productsModel.findById(req.params.id);
+        if (!existingProduct) {
+            return res.status(404).json({ message: "Producto no encontrado" });
+        }
+        
+        // Inicializar el objeto de actualización con los datos del body
+        const { name, description, category, price, stock } = req.body;
+        const updateData = { name, description, category, price, stock };
+        
+        // Si hay un nuevo archivo de imagen, procesar la actualización de la imagen
+        if (req.file) {
+            // Subir la nueva imagen a Cloudinary
+            const cloudinaryResult = await uploadImage(req.file.path, 'workbuddy/productos');
+            
+            // Actualizar el campo imagery con la nueva información
+            updateData.imagery = {
+                url: cloudinaryResult.url,
+                public_id: cloudinaryResult.public_id,
+                filename: cloudinaryResult.original_filename || req.file.originalname
+            };
+            
+            // Eliminar la imagen anterior de Cloudinary si existe
+            if (existingProduct.imagery && existingProduct.imagery.public_id) {
+                await deleteImage(existingProduct.imagery.public_id);
+            }
+            
+            // Eliminar el archivo temporal
+            await fs.unlink(req.file.path);
+        }
+        
+        // Actualizar el producto en la base de datos
+        const updatedProduct = await productsModel.findByIdAndUpdate(
             req.params.id,
-            { name, description, category, price, stock, imagery },
+            updateData,
             { new: true }
         );
-        res.json({ message: "Producto actualizado", product: updateProduct });
+        
+        res.json({ 
+            message: "Producto actualizado", 
+            product: updatedProduct 
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error actualizando el producto" });
+        // Si hay un archivo y ocurre un error, intentamos eliminar el archivo temporal
+        if (req.file) {
+            try {
+                await fs.unlink(req.file.path);
+            } catch (unlinkError) {
+                console.error("Error eliminando el archivo temporal:", unlinkError);
+            }
+        }
+        res.status(500).json({ message: "Error actualizando el producto", error: error.message });
     }
 };
 

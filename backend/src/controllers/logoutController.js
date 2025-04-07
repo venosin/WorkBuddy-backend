@@ -1,5 +1,5 @@
 const logoutController = {};
-import clientsModel from "../models/clients.js";
+import clientsModel from "../models/Clients.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 

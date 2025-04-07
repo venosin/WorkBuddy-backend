@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { config } from "../config.js";
-import clientsModel from "../models/clients.js";
+import clientsModel from "../models/Clients.js";
 import nodemailer from "nodemailer"; // Para envio de correos electronicos
 import crypto from "crypto"; // Para generar un código aleatorio
 
