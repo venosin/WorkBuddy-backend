@@ -24,7 +24,10 @@ import passwordRecoveryRoutes from "./src/routes/passwordRecovery.js";
 import profileRoutes from "./src/routes/profile.js";
 import favoritesRoutes from "./src/routes/favorites.js";
 import userSettingsRoutes from "./src/routes/userSettings.js";
-import userOrdersRoutes from "./src/routes/userOrders.js";
+
+
+// Nuevas rutas de pagos
+import paymentRoutes from "./src/routes/payment.js";
 
 //Creso la constante para poder usar express en otros archivos
 const app = express();
@@ -58,7 +61,9 @@ app.use("/wb/logout", logoutRoutes);
 app.use("/wb/profile", profileRoutes);
 app.use("/wb/favorites", favoritesRoutes);
 app.use("/wb/settings", userSettingsRoutes);
-app.use("/wb/user-orders", userOrdersRoutes);
+
+// Rutas de pagos
+app.use("/wb/payment", paymentRoutes);
 
 // Rutas publicas que no necesitan haber iniciado sesión
 app.use("/wb/registerEmployee", registerEmployeeRoutes);

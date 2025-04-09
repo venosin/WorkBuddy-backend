@@ -27,9 +27,9 @@ export const config = {
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
   },
-//   paypal: {
-//     clientId: process.env.PAYPAL_API_CLIENT_ID,
-//     clientSecret: process.env.PAYPAL_API_SECRET,
-//     PAYPAL_API: "https://api-m.sandbox.paypal.com/",
-//   },
+  paypal: {
+    clientId: process.env.PAYPAL_API_CLIENT_ID,
+    clientSecret: process.env.PAYPAL_API_SECRET,
+    PAYPAL_API: "https://api-m.sandbox.paypal.com/",
+  },
 };

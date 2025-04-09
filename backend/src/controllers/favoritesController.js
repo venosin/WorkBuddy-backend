@@ -132,3 +132,4 @@ favoritesController.removeFromFavorites = async (req, res) => {
 };
 
 export default favoritesController;
+
