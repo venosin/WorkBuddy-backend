@@ -65,9 +65,9 @@ ordersController.createOrder = async (req, res) => {
         }
         totalAmount = parseFloat(totalAmount.toFixed(2)); // Redondear a 2 decimales
 
-        // Parsear la dirección de envío en componentes
-        // Asumimos que shippingAdress está en formato "calle, ciudad, estado, código postal"
-        const addressParts = shippingAdress.split(',').map(part => part.trim());
+        // Recibir la dirección como un objeto estructurado
+        // shippingAdress ahora debe ser un objeto con propiedades: street, city, state, postalCode
+        const { street, city, state, postalCode } = shippingAdress;
         
         // Crear la nueva orden con los campos requeridos
         const newOrder = new Order({ 
@@ -79,10 +79,10 @@ ordersController.createOrder = async (req, res) => {
                 status: "pending"
             },
             shippingAddress: {
-                street: addressParts[0] || shippingAdress,
-                city: addressParts[1] || "Ciudad",
-                state: addressParts[2] || "Estado",
-                postalCode: addressParts[3] || "00000"
+                street,
+                city,
+                state,
+                postalCode
             },
             status: "pending",
             totalAmount: totalAmount
