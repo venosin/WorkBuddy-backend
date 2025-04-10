@@ -38,6 +38,7 @@ ordersController.createOrder = async (req, res) => {
         console.log("Body recibido:", req.body); // Depuración
 
         const { CartId, payMethod, shippingAdress } = req.body;
+        const { userId, userType } = req.user; // Obtener del token de autenticación
 
         // Validar que los datos existen
         if (!CartId || !payMethod || !shippingAdress) {
@@ -70,7 +71,9 @@ ordersController.createOrder = async (req, res) => {
         
         // Crear la nueva orden con los campos requeridos
         const newOrder = new Order({ 
-            CartId, 
+            CartId,
+            userId, // Referencia directa al usuario
+            userType, // Tipo de usuario (cliente o empleado)
             paymentInfo: {
                 method: payMethod,
                 status: "pending"
@@ -90,7 +93,7 @@ ordersController.createOrder = async (req, res) => {
         res.status(201).json({ message: "Orden creada con éxito", order });
     } catch (error) {
         console.error("Error al crear la orden:", error);
-        res.status(500).json({ message: "Error al crear la orden", error });
+        res.status(500).json({ message: "Error al crear la orden", error: error.message });
     }
 };
 
@@ -140,26 +143,77 @@ ordersController.deleteOrder = async (req, res) => {
 // OBTENER ÓRDENES DE UN USUARIO
 ordersController.getUserOrders = async (req, res) => {
     try {
-        // Primero obtenemos los carritos del usuario
         const { userId } = req.user;
-        const userCarts = await shoppingCartsModel.find({ clienteId: userId });
         
-        if (!userCarts || userCarts.length === 0) {
-            return res.json([]);
+        // Obtener parámetros de filtro de la consulta
+        const { status, startDate, endDate, limit = 10, page = 1 } = req.query;
+        
+        // Construir el filtro base
+        let filter = {};
+        
+        // Verificar si el modelo ya tiene el campo userId
+        const hasUserIdField = Object.keys(Order.schema.paths).includes('userId');
+        
+        if (hasUserIdField) {
+            // Usar directamente el ID de usuario si existe el campo
+            filter.userId = userId;
+        } else {
+            // Enfoque anterior: buscar a través de carritos
+            // Primero obtenemos los carritos del usuario
+            const userCarts = await shoppingCartsModel.find({ clienteId: userId });
+            
+            if (!userCarts || userCarts.length === 0) {
+                return res.json({ orders: [], total: 0, page: parseInt(page), pages: 0 });
+            }
+            
+            // Obtener los IDs de los carritos
+            const cartIds = userCarts.map(cart => cart._id);
+            
+            // Añadir filtro de carritos
+            filter.CartId = { $in: cartIds };
         }
         
-        // Obtener los IDs de los carritos
-        const cartIds = userCarts.map(cart => cart._id);
+        // Aplicar filtro por estado si se proporciona
+        if (status) {
+            filter.status = status;
+        }
         
-        // Buscar órdenes que contengan estos carritos
-        const orders = await Order.find({ CartId: { $in: cartIds } })
-            .populate("CartId")
-            .sort({ createdAt: -1 });
+        // Aplicar filtro por fecha si se proporciona
+        if (startDate || endDate) {
+            filter.createdAt = {};
+            if (startDate) filter.createdAt.$gte = new Date(startDate);
+            if (endDate) filter.createdAt.$lte = new Date(endDate);
+        }
+        
+        // Calcular skip para paginación
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        
+        // Contar total de registros para paginación
+        const total = await Order.countDocuments(filter);
+        const pages = Math.ceil(total / parseInt(limit));
+        
+        // Buscar órdenes con filtros y paginación
+        const orders = await Order.find(filter)
+            .populate({
+                path: "CartId",
+                populate: {
+                    path: "products.idProduct",
+                    select: "name price imageUrl description" // Selecciona campos relevantes
+                }
+            })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
 
-        res.json(orders);
+        res.json({
+            orders,
+            total,
+            page: parseInt(page),
+            pages
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error al obtener las órdenes del usuario" });
+        console.error("Error al obtener las órdenes del usuario:", error);
+        res.status(500).json({ message: "Error al obtener las órdenes del usuario", error: error.message });
     }
 };
 

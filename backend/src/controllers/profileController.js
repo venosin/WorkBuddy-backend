@@ -10,6 +10,7 @@ import clientModel from "../models/Clients.js";
 import employeeModel from "../models/Employees.js";
 import { uploadImage, deleteImage } from "../config/cloudinary.js";
 import fs from "fs/promises";
+import ordersController from "./ordersController.js";
 
 const profileController = {};
 
@@ -137,6 +138,15 @@ profileController.updateUserProfile = async (req, res) => {
     console.error("Error al actualizar el perfil:", error);
     res.status(500).json({ message: "Error al actualizar el perfil", error: error.message });
   }
+};
+
+/**
+ * Obtiene las órdenes del usuario actual para la sección "Mis Pedidos"
+ * Este método actúa como un proxy hacia ordersController.getUserOrders
+ */
+profileController.getUserOrders = async (req, res) => {
+  // Simplemente redirigimos la llamada al controlador de órdenes
+  await ordersController.getUserOrders(req, res);
 };
 
 export default profileController;

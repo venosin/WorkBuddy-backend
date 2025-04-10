@@ -1,11 +1,14 @@
 /*
 Modelo de Orders mejorado:
 Campos: 
+- userId: Referencia directa al usuario que hizo la orden
+- userType: Tipo de usuario (cliente o empleado)
 - CartId: Referencia al carrito de compras
 - paymentInfo: Información del pago (método, estado, transacción)
 - shippingAddress: Dirección de envío
 - status: Estado de la orden (pendiente, pagada, enviada, entregada, cancelada)
 - totalAmount: Monto total de la orden
+- notificationSent: Indica si se ha enviado notificación sobre el pago
 */
 
 import { Schema, model } from "mongoose";
@@ -16,6 +19,16 @@ const orderSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "shoppingCarts",
             required: true,
+        },
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "clients", // Referencia a la colección de clientes
+            required: true,
+        },
+        userType: {
+            type: String,
+            enum: ["clients", "employees"],
+            default: "clients"
         },
         paymentInfo: {
             method: {
@@ -51,6 +64,10 @@ const orderSchema = new Schema(
         totalAmount: {
             type: Number,
             required: true
+        },
+        notificationSent: {
+            type: Boolean,
+            default: false
         }
     },
     {

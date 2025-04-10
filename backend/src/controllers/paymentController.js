@@ -11,6 +11,7 @@ import { config } from "../config.js";
 import ordersModel from "../models/Orders.js"; 
 import shoppingCartsModel from "../models/ShoppingCarts.js";
 import UserSettings from "../models/UserSettings.js";
+import notificationService from "../services/notificationService.js";
 
 // Configuración de PayPal
 const clientId = config.paypal.clientId;
@@ -147,6 +148,49 @@ paymentController.capturePayment = async (req, res) => {
     order.paymentInfo.paymentDate = new Date();
     order.status = "paid";
     await order.save();
+    
+    // Enviar notificación al usuario
+    if (!order.notificationSent) {
+      try {
+        // Determinar el ID de usuario desde la orden
+        const userId = order.userId;
+        
+        // Si el modelo actualizado ya tiene el campo userId, usar directamente
+        if (userId) {
+          // Enviar notificación por email
+          const emailSent = await notificationService.sendPaymentCompletedEmail(userId, order);
+          
+          // Registrar notificación en la base de datos (opcional)
+          await notificationService.recordNotification(userId, order._id, "payment_completed");
+          
+          // Marcar la orden como notificada
+          order.notificationSent = true;
+          await order.save();
+          
+          console.log(`Notificación enviada para orden ${order._id}: ${emailSent ? 'Éxito' : 'Fallida'}`);
+        } else {
+          // Para órdenes antiguas que no tienen el campo userId
+          // Podemos intentar obtener el usuario a través del carrito
+          const cart = await shoppingCartsModel.findById(order.CartId);
+          if (cart && cart.clienteId) {
+            // Enviar notificación por email
+            const emailSent = await notificationService.sendPaymentCompletedEmail(cart.clienteId, order);
+            
+            // Registrar notificación
+            await notificationService.recordNotification(cart.clienteId, order._id, "payment_completed");
+            
+            // Marcar la orden como notificada
+            order.notificationSent = true;
+            await order.save();
+            
+            console.log(`Notificación enviada (desde carrito) para orden ${order._id}: ${emailSent ? 'Éxito' : 'Fallida'}`);
+          }
+        }
+      } catch (notificationError) {
+        // No interrumpimos el flujo principal si hay error en notificación
+        console.error("Error al enviar notificación:", notificationError);
+      }
+    }
     
     res.json({ 
       status: capture.result.status,

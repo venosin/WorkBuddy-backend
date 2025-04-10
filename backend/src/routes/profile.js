@@ -17,4 +17,7 @@ router.route("/")
   .get(profileController.getUserProfile)
   .put(upload.single("profileImage"), profileController.updateUserProfile);
 
+// Ruta para obtener las órdenes del usuario en la sección "Mis Pedidos"
+router.get("/orders", profileController.getUserOrders);
+
 export default router;
