@@ -14,8 +14,8 @@ import clientModel from "../models/Clients.js";
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: config.email.user,
-        pass: config.email.pass
+        user: config.email.email,
+        pass: config.email.password
     }
 });
 
