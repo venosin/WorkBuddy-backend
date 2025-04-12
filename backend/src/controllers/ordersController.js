@@ -37,11 +37,11 @@ ordersController.createOrder = async (req, res) => {
     try {
         console.log("Body recibido:", req.body); // Depuración
 
-        const { CartId, payMethod, shippingAdress } = req.body;
+        const { CartId, payMethod, shippingAddress } = req.body;
         const { userId, userType } = req.user; // Obtener del token de autenticación
 
         // Validar que los datos existen
-        if (!CartId || !payMethod || !shippingAdress) {
+        if (!CartId || !payMethod || !shippingAddress) {
             return res.status(400).json({ message: "Faltan datos obligatorios" });
         }
 
@@ -66,8 +66,8 @@ ordersController.createOrder = async (req, res) => {
         totalAmount = parseFloat(totalAmount.toFixed(2)); // Redondear a 2 decimales
 
         // Recibir la dirección como un objeto estructurado
-        // shippingAdress ahora debe ser un objeto con propiedades: street, city, state, postalCode
-        const { street, city, state, postalCode } = shippingAdress;
+        // shippingAddress ahora debe ser un objeto con propiedades: street, city, state, postalCode
+        const { street, city, state, postalCode } = shippingAddress;
         
         // Crear la nueva orden con los campos requeridos
         const newOrder = new Order({ 
