@@ -45,16 +45,31 @@ export const verifyToken = (req, res, next) => {
  * @param {Array} roles - Array de roles permitidos ('client', 'employee', 'admin')
  * @returns {Function} Middleware
  */
-export const checkRole = (roles) => {
+export const validateAuthToken = (allowedUserTypes= []) => {
+
   return (req, res, next) => {
-    const { userType } = req.user;
-    
-    if (!roles.includes(userType)) {
-      return res.status(403).json({ 
-        message: "Acceso denegado: no tienes permiso para esta operación" 
-      });
-    }
-    
-    next();
-  };
-};
+   try { 
+      
+     //1- Extraer el token de las cookies 
+     const {authToken } = req.cookies;
+
+     //2-Imprimir un mensaje de error si no gay cookies
+     if(!authToken){
+      return res.json({message:"No authentication token found, you must login homie"})
+     }
+     //3- Extraer la informacion del token
+     const decoded = jsonwebtoken.verify(authToken, config.jwt.secret);
+
+     // 4- Verificar si quien inicio sesion es un usuario permitido
+     if(!allowedUserTypes.includes(decoded.userType)){
+      return res.json({message: "Access denied"})
+     }
+
+     //5- Si todo esta bien, continuar con la siguiente funcion
+     next();
+
+   }  catch (error){
+      console.log("error"+error);
+   } 
+  }
+}

@@ -19,7 +19,7 @@ import loginRoutes from "./src/routes/login.js";
 import logoutRoutes from "./src/routes/logout.js";
 //recuperación de contraseña
 import passwordRecoveryRoutes from "./src/routes/passwordRecovery.js";
-
+import { validateAuthToken } from "./src/middlewares/authMiddleware.js";
 // Nuevas rutas de perfil de usuario, favoritos, configuración y pedidos
 import profileRoutes from "./src/routes/profile.js";
 import favoritesRoutes from "./src/routes/favorites.js";
@@ -48,7 +48,7 @@ app.use(cookieParser()); //Para que POSTMAN guarde el token en una cookie
 //RODRI
 app.use("/wb/clients", clientsRouter);
 app.use("/wb/discountCodes", dCodesRouter)
-app.use("/wb/employees", employeesRoutes);
+app.use("/wb/employees", /*validateAuthToken(["employees", "admin"] )*/ employeesRoutes);
 app.use("/wb/offers", offersRoute)
 // steven
 app.use("/wb/products", productsRoutes);
