@@ -4,17 +4,17 @@ const clientSchema = new Schema(
   {
     name: {
       type: String,
-      require: true,
+      required: true,  // Cambiado de "require" a "required"
       maxLength: 25,
     },
     phoneNumber: {
       type: String,
-      require: true,
+      required: true,  // Cambiado de "require" a "required"
       maxLength: 9,
     },
     email: {
       type: String,
-      require: true,
+      required: true,  // Cambiado de "require" a "required"
       match: [
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
         "Por favor, ingrese un correo electrónico válido",
@@ -24,16 +24,16 @@ const clientSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: true,  // Este ya está correcto
       minlength: 8,
     },
     address: {
       type: String,
-      require: true,
+      required: true,  // Cambiado de "require" a "required"
     },
     birthday: {
       type: Date,
-      require: true,
+      required: true,  // Cambiado de "require" a "required"
     },
     isVerified: {
       type: Boolean,
@@ -43,4 +43,4 @@ const clientSchema = new Schema(
   { timestamps: true, strict: true }
 );
 
-export default model("clients", clientSchema)
+export default model("clients", clientSchema);

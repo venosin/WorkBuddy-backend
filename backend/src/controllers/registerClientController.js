@@ -93,12 +93,12 @@ registerClientController.register = async (req, res) => {
       console.log("Email enviado:" + info.response);
     });
 
-    // Enviar una respuesta con el código de verificación
-    res.status(201).json({
+      // Enviar una respuesta con el código de verificación
+      res.status(201).json({
       message:
         "Cliente registrado. Por favor verifica tu correo con el código enviado.",
-      token: tokenCode, // Devolver el token para verificación posterior
-    });
+        token: tokenCode, // Devolver el token para verificación posterior
+      });
   } catch (error) {
     res.status(500).json({ message: "Error", error: error.message });
   }
