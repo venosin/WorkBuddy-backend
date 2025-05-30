@@ -8,19 +8,51 @@ clientsController.getClients = async (req, res) => {
 };
 
 clientsController.createClients = async (req, res) => {
-  const { name, phoneNumber, email, password, address, birthday, isVerified } =
-    req.body;
-  const newClient = new clientsModel({
-    name,
-    phoneNumber,
-    email,
-    password,
-    address,
-    birthday,
-    isVerified,
-  });
-  await newClient.save();
-  res.json("Cliente creado con éxitosamente");
+  try {
+    const { name, phoneNumber, email, password, address, birthday, isVerified } =
+      req.body;
+    
+    // Verificar si ya existe un cliente con ese email
+    const existingClient = await clientsModel.findOne({ email });
+    if (existingClient) {
+      return res.status(400).json({ 
+        message: "Ya existe un cliente con ese correo electrónico",
+        error: "duplicate_email"
+      });
+    }
+    
+    const newClient = new clientsModel({
+      name,
+      phoneNumber,
+      email,
+      password,
+      address,
+      birthday,
+      isVerified,
+    });
+    
+    await newClient.save();
+    res.status(201).json({ 
+      message: "Cliente creado exitosamente",
+      client: { id: newClient._id, name: newClient.name, email: newClient.email }
+    });    
+  } catch (error) {
+    console.error('Error al crear cliente:', error);
+    
+    // Si es un error de duplicidad
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        message: "Ya existe un cliente con ese correo electrónico",
+        error: "duplicate_email"
+      });
+    }
+    
+    // Otros errores
+    res.status(500).json({ 
+      message: "Error al crear el cliente", 
+      error: error.message 
+    });
+  }
 };
 
 clientsController.deleteClients = async (req, res) => {

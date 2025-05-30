@@ -35,14 +35,55 @@ ordersController.getOrderById = async (req, res) => {
 // CREAR UNA NUEVA ORDEN
 ordersController.createOrder = async (req, res) => {
     try {
-        console.log("Body recibido:", req.body); // Depuración
+        console.log("Body recibido en createOrder:", req.body); // Depuración mejorada
+        console.log("req.user:", req.user); // Ver qué contiene el objeto user
+
+        // Usar userId y userType del body si no están disponibles en req.user
+        let userId, userType;
+        
+        if (req.user && req.user.id) {
+            userId = req.user.id;
+            userType = req.user.userType || 'clients';
+            console.log("Usando datos de autenticación:", userId, userType);
+        } else if (req.body.userId) {
+            userId = req.body.userId;
+            userType = req.body.userType || 'clients';
+            console.log("Usando datos del body:", userId, userType);
+        } else {
+            console.log("No se encontraron datos de usuario");
+            return res.status(400).json({ message: "Datos de usuario no encontrados" });
+        }
 
         const { CartId, payMethod, shippingAddress } = req.body;
-        const { userId, userType } = req.user; // Obtener del token de autenticación
+        
+        console.log("CartId:", CartId);
+        console.log("payMethod:", payMethod);
+        console.log("shippingAddress:", shippingAddress);
 
         // Validar que los datos existen
-        if (!CartId || !payMethod || !shippingAddress) {
-            return res.status(400).json({ message: "Faltan datos obligatorios" });
+        if (!CartId) {
+            console.log("Falta CartId");
+            return res.status(400).json({ message: "Falta CartId" });
+        }
+        
+        if (!payMethod) {
+            console.log("Falta payMethod");
+            return res.status(400).json({ message: "Falta payMethod" });
+        }
+        
+        if (!shippingAddress) {
+            console.log("Falta shippingAddress");
+            return res.status(400).json({ message: "Falta shippingAddress" });
+        }
+        
+        // Validar que shippingAddress tiene todas las propiedades necesarias
+        if (!shippingAddress || 
+            !shippingAddress.street || 
+            !shippingAddress.city || 
+            !shippingAddress.state || 
+            !shippingAddress.postalCode) {
+            console.log("Faltan campos en shippingAddress:", shippingAddress);
+            return res.status(400).json({ message: "Faltan campos en la dirección de envío" });
         }
 
         // Validar que CartId es un ObjectId válido
@@ -65,10 +106,6 @@ ordersController.createOrder = async (req, res) => {
         }
         totalAmount = parseFloat(totalAmount.toFixed(2)); // Redondear a 2 decimales
 
-        // Recibir la dirección como un objeto estructurado
-        // shippingAddress ahora debe ser un objeto con propiedades: street, city, state, postalCode
-        const { street, city, state, postalCode } = shippingAddress;
-        
         // Crear la nueva orden con los campos requeridos
         const newOrder = new Order({ 
             CartId,
@@ -78,12 +115,7 @@ ordersController.createOrder = async (req, res) => {
                 method: payMethod,
                 status: "pending"
             },
-            shippingAddress: {
-                street,
-                city,
-                state,
-                postalCode
-            },
+            shippingAddress: shippingAddress, // Usar el objeto shippingAddress directamente
             status: "pending",
             totalAmount: totalAmount
         });
@@ -214,6 +246,94 @@ ordersController.getUserOrders = async (req, res) => {
     } catch (error) {
         console.error("Error al obtener las órdenes del usuario:", error);
         res.status(500).json({ message: "Error al obtener las órdenes del usuario", error: error.message });
+    }
+};
+
+// CREAR UNA ORDEN ADMINISTRATIVA (sin necesidad de crear un carrito primero)
+ordersController.createAdminOrder = async (req, res) => {
+    try {
+        console.log("Body recibido en createAdminOrder:", req.body);
+        
+        const { userId, userType, products, payMethod, shippingAddress } = req.body;
+        
+        // Validar datos obligatorios
+        if (!userId) {
+            return res.status(400).json({ message: "Falta el ID del cliente" });
+        }
+        
+        if (!products || !Array.isArray(products) || products.length === 0) {
+            return res.status(400).json({ message: "Debe incluir al menos un producto" });
+        }
+        
+        if (!payMethod) {
+            return res.status(400).json({ message: "Falta el método de pago" });
+        }
+        
+        if (!shippingAddress || !shippingAddress.street || !shippingAddress.city || 
+            !shippingAddress.state || !shippingAddress.postalCode) {
+            return res.status(400).json({ message: "Faltan datos en la dirección de envío" });
+        }
+        
+        // 1. Crear el carrito de compras primero
+        const shoppingCartModel = await import("../models/ShoppingCarts.js").then(m => m.default);
+        
+        // Calcular el total de productos
+        let totalAmount = 0;
+        const productsModel = await import("../models/Products.js").then(m => m.default);
+        
+        // Transformar los productos para el formato esperado por el modelo de carrito
+        const cartProducts = [];
+        for (const item of products) {
+            const product = await productsModel.findById(item.productId);
+            if (!product) {
+                return res.status(404).json({ message: `Producto ${item.productId} no encontrado` });
+            }
+            
+            totalAmount += product.price * item.quantity;
+            
+            cartProducts.push({
+                idProduct: item.productId,
+                quantity: parseInt(item.quantity)
+            });
+        }
+        totalAmount = parseFloat(totalAmount.toFixed(2)); // Redondear a 2 decimales
+        
+        // Crear el carrito
+        const cart = new shoppingCartModel({
+            clienteId: userId, // Asegurarse de usar clienteId con 'e'
+            products: cartProducts,
+            total: totalAmount,
+            state: 'active'
+        });
+        
+        const savedCart = await cart.save();
+        console.log("Carrito creado:", savedCart);
+        
+        // 2. Crear la orden con el carrito creado
+        const newOrder = new Order({ 
+            CartId: savedCart._id,
+            userId, // ID del cliente
+            userType: userType || 'clients', // Tipo de usuario
+            paymentInfo: {
+                method: payMethod,
+                status: "pending"
+            },
+            shippingAddress: shippingAddress,
+            status: "pending",
+            totalAmount: totalAmount
+        });
+        
+        const order = await newOrder.save();
+        console.log("Orden creada:", order);
+        
+        res.status(201).json({ 
+            message: "Orden administrativa creada con éxito", 
+            order,
+            cart: savedCart
+        });
+    } catch (error) {
+        console.error("Error al crear orden administrativa:", error);
+        res.status(500).json({ message: "Error al crear la orden", error: error.message });
     }
 };
 

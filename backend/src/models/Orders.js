@@ -33,7 +33,7 @@ const orderSchema = new Schema(
         paymentInfo: {
             method: {
                 type: String,
-                enum: ["paypal", "credit_card", "efectivo"],
+                enum: ["paypal", "credit_card", "debit_card", "efectivo", "transfer"],
                 required: true,
             },
             status: {

@@ -19,6 +19,7 @@ import loginRoutes from "./src/routes/login.js";
 import logoutRoutes from "./src/routes/logout.js";
 //recuperación de contraseña
 import passwordRecoveryRoutes from "./src/routes/passwordRecovery.js";
+import resetPasswordRoutes from "./src/routes/resetPassword.js";
 import { validateAuthToken } from "./src/middlewares/authMiddleware.js";
 // Nuevas rutas de perfil de usuario, favoritos, configuración y pedidos
 import profileRoutes from "./src/routes/profile.js";
@@ -35,10 +36,16 @@ const app = express();
 // Middlewares
 app.use(
     cors({
-      origin: "http://localhost:5173", // Dominio del cliente
+      origin: ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"], // Dominios permitidos
       credentials: true, // Permitir envío de cookies y credenciales
     })
   );
+
+// Middleware para debugging de solicitudes
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 //middleware para aceptar datos desde postman
 app.use(express.json()); // Aceptar JSON en las solicitudes
@@ -70,6 +77,7 @@ app.use("/wb/registerEmployee", registerEmployeeRoutes);
 app.use("/wb/registerClient", registerClientRoutes);
 app.use("/wb/login", loginRoutes);
 app.use("/wb/passwordRecovery", passwordRecoveryRoutes);
+app.use("/wb/reset", resetPasswordRoutes);
 
 export default app;
 

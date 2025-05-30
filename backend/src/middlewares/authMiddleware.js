@@ -12,12 +12,24 @@ import { config } from "../config.js";
  */
 export const verifyToken = (req, res, next) => {
   try {
-    // Obtener el token de la cookie
-    const token = req.cookies.authToken;
+    // Obtener el token de la cookie o del header Authorization
+    let token = req.cookies?.authToken;
+    
+    // Si no hay token en las cookies, intentar obtenerlo del header Authorization
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+      console.log('Token obtenido del header:', token); // Para depuración
+    } else if (token) {
+      console.log('Token obtenido de cookies:', token); // Para depuración
+    }
     
     if (!token) {
+      console.log('No se encontró token en cookies ni en header'); // Para depuración
       return res.status(401).json({ message: "No hay token, acceso denegado" });
     }
+    
+    // Para depuración
+    console.log('Verificando token:', token.substring(0, 10) + '...');
     
     // Verificar el token
     jwt.verify(token, config.jwt.secret, (error, decoded) => {
@@ -25,6 +37,8 @@ export const verifyToken = (req, res, next) => {
         console.error("Error al verificar token:", error);
         return res.status(401).json({ message: "Token inválido" });
       }
+      
+      console.log('Token verificado con éxito, payload:', decoded);
       
       // Agregar información del usuario a la solicitud
       req.user = {

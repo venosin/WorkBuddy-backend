@@ -4,16 +4,16 @@ const employeeSchema = new Schema(
   {
     name: {
       type: String,
-      require: true,
+      required: true,
     },
     phoneNumber: {
       type: String,
-      require: true,
+      required: true,
       maxLength: 9,
     },
     email: {
       type: String,
-      require: true,
+      required: true,
       match: [
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
         "Por favor, ingrese un correo electrónico válido",
@@ -28,16 +28,16 @@ const employeeSchema = new Schema(
     },
     hiringDate: {
       type: Date,
-      require: true,
+      required: true,
     },
     dui: {
       type: String,
-      require: true,
+      required: true,
       maxLength: 10,
     },
     Isss: {
       type: String,
-      require: true,
+      required: true,
     },
   },
   {

@@ -5,7 +5,7 @@ const clientSchema = new Schema(
     name: {
       type: String,
       required: true,  // Cambiado de "require" a "required"
-      maxLength: 25,
+      maxLength: 50,  // Aumentado de 25 a 50 para permitir nombres completos
     },
     phoneNumber: {
       type: String,

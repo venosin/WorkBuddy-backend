@@ -11,6 +11,9 @@ router.route("/")
   .get(ordersController.getOrders)
   .post(ordersController.createOrder);
 
+// Ruta para crear órdenes desde el panel administrativo
+router.post("/admin", ordersController.createAdminOrder);
+
 // Ruta para obtener las órdenes del usuario actual
 router.get("/user", ordersController.getUserOrders);
 
