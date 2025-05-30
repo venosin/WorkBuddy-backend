@@ -89,7 +89,7 @@ CLOUDINARY_API_SECRET=tu_api_secret
 
 4. Inicia el servidor:
 ```bash
-npm start
+node index.js
 ```
 
 ### Configuración del Frontend

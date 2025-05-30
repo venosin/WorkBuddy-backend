@@ -337,8 +337,8 @@ const Orders = () => {
   };
 
   return (
-    <div className="py-6 w-full" style={{width: '100%'}}>
-      <div style={{width: '100%'}} className="w-full px-4 sm:px-6 md:px-8">
+    <div className="py-6 w-full h-full">
+      <div className="w-full">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900">Órdenes</h1>
           <button
@@ -351,15 +351,15 @@ const Orders = () => {
         </div>
       </div>
 
-      <div style={{width: '100%'}} className="w-full px-4 sm:px-6 md:px-8 mt-6">
+      <div className="w-full mt-6">
         {loading ? (
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="w-full">
-            <div className="bg-white shadow overflow-hidden sm:rounded-md w-full">
-              <ul className="divide-y divide-gray-200 w-full">
+          <div className="w-full max-w-full">
+            <div className="bg-white shadow overflow-hidden sm:rounded-md w-full max-w-full">
+              <ul className="divide-y divide-gray-200 w-full max-w-full">
               {orders.length > 0 ? (
                 orders.map((order) => (
                   <li key={order._id}>
@@ -592,7 +592,7 @@ const Orders = () => {
       {/* Order Detail Modal */}
       {showDetailModal && selectedOrder && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto relative">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto relative text-gray-800">
             {/* Botón X para cerrar */}
             <button
               onClick={handleCloseDetailModal}

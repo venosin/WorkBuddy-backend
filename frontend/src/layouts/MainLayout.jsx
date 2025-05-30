@@ -11,18 +11,18 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
-      {/* Sidebar - posición absoluta para que no afecte el layout */}
-      <div className="fixed left-0 top-0 bottom-0 z-20">
+    <div className="flex h-screen bg-white">
+      {/* Sidebar con ancho fijo */}
+      <aside className="fixed inset-y-0 left-0 w-64 bg-primary z-20">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-      </div>
+      </aside>
       
-      {/* Main Content - con margen izquierdo fijo */}
-      <div className="flex flex-col w-full pl-64">
+      {/* Contenido principal que ocupa todo el resto del espacio */}
+      <div className="absolute left-64 right-0 flex flex-col min-h-screen">
         <Header toggleSidebar={toggleSidebar} />
         
-        <main className="flex-1 overflow-auto w-full">
-          <div className="w-full p-4">
+        <main className="flex-grow overflow-auto">
+          <div className="container mx-auto px-4 py-4">
             <Outlet />
           </div>
         </main>

@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 // Utilizamos Icon como componente dinámico para mostrar el ícono correcto
+// eslint-disable-next-line no-unused-vars
 const DashboardCard = ({ title, description, icon: Icon, to, bgColor }) => {
   return (
     <Link to={to} className="block">
