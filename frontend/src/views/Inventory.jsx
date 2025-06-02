@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon, PlusIcon, DocumentIcon } from '@heroicons/react/24/outline';
 import { useForm } from 'react-hook-form';
 import useAuth from '../hooks/useAuth';
 
@@ -165,62 +165,73 @@ const Inventory = () => {
   };
 
   return (
-    <div className="py-6">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold text-gray-900">Inventario</h1>
+    <div className="py-4 md:py-6 w-full overflow-hidden">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 w-full sm:w-auto text-center sm:text-left mb-3 sm:mb-0">Inventario</h1>
           <button
             onClick={() => handleOpenModal()}
-            className="bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-md flex items-center"
+            className="bg-primary hover:bg-primary-light text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md flex items-center justify-center w-full sm:w-auto transition-colors duration-200"
           >
-            <PlusIcon className="h-5 w-5 mr-2" />
+            <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
             Nuevo Producto
           </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-6">
+      {/* Línea separadora */}
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 my-8 sm:my-12 md:my-16">
+        <div className="border-t border-gray-200"></div>
+      </div>
+
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-8 sm:mt-16 md:mt-32">
         {loading ? (
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {products.length > 0 ? (
               products.map((product) => (
-                <div key={product._id} className="bg-white rounded-lg shadow overflow-hidden">
-                  <div className="h-48 bg-gray-200 flex items-center justify-center">
+                <div key={product._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full">
+                  <div className="h-36 sm:h-40 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
                     {product.imagery && product.imagery.url ? (
                       <img 
                         src={product.imagery.url} 
                         alt={product.name} 
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                        loading="lazy"
                       />
                     ) : (
-                      <div className="text-gray-400">Sin imagen</div>
+                      <div className="text-gray-400 text-sm sm:text-base flex items-center justify-center h-full w-full">
+                        <DocumentIcon className="h-8 w-8 mr-2 text-gray-300" />
+                        <span>Sin imagen</span>
+                      </div>
                     )}
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
-                    <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
+                  <div className="p-3 sm:p-4 flex flex-col flex-grow">
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 line-clamp-1">{product.name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 line-clamp-2 mt-1">{product.description}</p>
                     <div className="mt-2 flex justify-between items-center">
-                      <span className="text-lg font-semibold">${product.price}</span>
-                      <span className="text-sm bg-gray-100 px-2 py-1 rounded">
+                      <span className="text-base sm:text-lg font-semibold">${product.price}</span>
+                      <span className="text-xs sm:text-sm bg-gray-100 px-2 py-1 rounded">
                         Stock: {product.stock}
                       </span>
                     </div>
-                    <div className="mt-4 flex justify-end space-x-2">
+                    <div className="sm:mt-4 flex justify-end space-x-3 mt-auto">
                       <button
                         onClick={() => handleOpenModal(product)}
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50 transition-colors duration-200"
+                        aria-label="Editar producto"
                       >
-                        <PencilIcon className="h-5 w-5" />
+                        <PencilIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                       </button>
                       <button
                         onClick={() => setConfirmDelete(product._id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors duration-200 md:p-2 md:rounded-md"
+                        aria-label="Eliminar producto"
                       >
-                        <TrashIcon className="h-5 w-5" />
+                        <TrashIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                       </button>
                     </div>
                   </div>
@@ -237,11 +248,22 @@ const Inventory = () => {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
-            </h2>
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
+          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 max-h-[95vh] overflow-y-auto relative transition-all duration-300 ">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
+              </h2>
+              <button 
+                onClick={handleCloseModal} 
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100"
+                aria-label="Cerrar modal"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-4">
                 <div>
@@ -348,20 +370,33 @@ const Inventory = () => {
 
       {/* Delete Confirmation Modal */}
       {confirmDelete && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-semibold mb-4">Confirmar Eliminación</h2>
-            <p className="mb-4">¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.</p>
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-3 sm:p-4 z-50">
+          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 relative transition-all duration-300 ">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Confirmar Eliminación</h2>
+              <button 
+                onClick={() => setConfirmDelete(null)} 
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100"
+                aria-label="Cerrar modal"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="mb-6">
+              <p className="text-gray-600 text-sm sm:text-base">¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.</p>
+            </div>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
               >
                 Cancelar
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                className="px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors duration-200"
               >
                 Eliminar
               </button>
