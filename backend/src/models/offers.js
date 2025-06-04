@@ -1,33 +1,40 @@
 import { Schema, model } from "mongoose";
 
-const  offersSchema = new Schema(
+const offersSchema = new Schema(
   {
     productId: {
       type: Schema.Types.ObjectId,
       ref: "products",
-      require: true,
+      required: true,
     },
     discountType: {
       type: String,
-      require: true,
+      required: true,
+      enum: ['percentage', 'fixed_value'],
     },
     percentage: {
       type: Number,
+      // Consider adding a custom validator if discountType is 'percentage'
+      // min: 0, max: 100 // if it's a percentage
     },
     value: {
       type: Number,
+      // Consider adding a custom validator if discountType is 'fixed_value'
     },
     from: {
       type: Date,
-      require: true,
+      required: true,
     },
     to: {
       type: Date,
-      require: true,
+      required: true,
+      // Consider adding a custom validator to ensure 'to' is after 'from'
     },
     state: {
       type: String,
-      require: true,
+      required: true,
+      enum: ['active', 'inactive', 'scheduled', 'expired'],
+      default: 'scheduled', // Or 'active' depending 
     },
   },
   {

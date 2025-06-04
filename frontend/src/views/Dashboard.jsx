@@ -66,10 +66,10 @@ const Dashboard = () => {
       bgColor: 'bg-green-600'
     },
     {
-      title: 'Reportes',
-      description: 'Generar informes detallados y análisis',
+      title: 'Ofertas',
+      description: 'Gestionar ofertas y promociones especiales',
       icon: DocumentTextIcon,
-      to: '/reports',
+      to: '/offers',
       bgColor: 'bg-teal-600'
     },
     {

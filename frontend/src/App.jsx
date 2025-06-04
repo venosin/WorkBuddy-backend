@@ -9,6 +9,7 @@ import Users from './views/Users'
 import Orders from './views/Orders'
 import Inventory from './views/Inventory'
 import Discounts from './views/Discounts'
+import Offers from './views/Offers' // Importamos el nuevo componente Offers
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
               <Route path="/orders" element={<Orders />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/discounts" element={<Discounts />} />
-              <Route path="/reports" element={<div className="p-4">Página de Reportes</div>} />
+              <Route path="/offers" element={<Offers />} />
               <Route path="/settings" element={<div className="p-4">Página de Configuración</div>} />
             </Route>
           </Route>
