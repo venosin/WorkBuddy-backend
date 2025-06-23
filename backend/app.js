@@ -26,6 +26,10 @@ import profileRoutes from "./src/routes/profile.js";
 import favoritesRoutes from "./src/routes/favorites.js";
 import userSettingsRoutes from "./src/routes/userSettings.js";
 
+import swagger from "swagger-ui-express";
+import fs from "fs";
+import path from "path";
+
 
 // Nuevas rutas de pagos
 import paymentRoutes from "./src/routes/payment.js";
@@ -50,9 +54,13 @@ app.use((req, res, next) => {
 //middleware para aceptar datos desde postman
 app.use(express.json()); // Aceptar JSON en las solicitudes
 app.use(cookieParser()); //Para que POSTMAN guarde el token en una cookie 
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(path.resolve("./jsonSwagger.json"), "utf-8")
+);
 
 //Mando a llamar a rutas 
 //RODRI
+app.use("/api/docs", swagger.serve, swagger.setup(swaggerDocument));
 app.use("/wb/clients", clientsRouter);
 app.use("/wb/discountCodes", dCodesRouter)
 app.use("/wb/employees", /*validateAuthToken(["employees", "admin"] )*/ employeesRoutes);
